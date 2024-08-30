@@ -2,6 +2,7 @@ package okhttp;
 
 import com.google.gson.Gson;
 import dto.ContactDTO;
+import dto.ErrorDTO;
 import dto.MessageDTO;
 import okhttp3.*;
 import org.testng.Assert;
@@ -25,8 +26,8 @@ public class DeleteContactByIDOkhttp {
         ContactDTO contactDTO = ContactDTO.builder()
                 .name("Maria")
                 .lastName("Madonna")
-                .email("mariam@mail.ru")
-                .phone("123456789101")
+                .email("mariam" +i + "@mail.ru")
+                .phone("123456789101" +i)
                 .address("NY")
                 .description("girl")
                 .build();
@@ -70,11 +71,35 @@ public class DeleteContactByIDOkhttp {
 
         Assert.assertEquals(dto.getMessage(), "Contact was deleted!");
     }
+
+    @Test
+    public void deleteContactByIDWrongToken() throws IOException {
+        Request request = new Request.Builder()
+                .url("https://contactapp-telran-backend.herokuapp.com/v1/contacts/"+id)
+                .delete()
+                .addHeader("Authorization", "jknvhjsfvyjdgkfjvhvbljdg")
+                .build();
+        Response response = client.newCall(request).execute();
+        Assert.assertEquals(response.code(), 401);
+
+        ErrorDTO errorDTO = gson.fromJson(response.body().string(), ErrorDTO.class);
+        Assert.assertEquals(errorDTO.getError(), "Unauthorized");
+    }
+
+    @Test
+    public void deleteContactByIDNotFound() throws IOException {
+        Request request = new Request.Builder()
+                .url("https://contactapp-telran-backend.herokuapp.com/v1/contacts/"+123)
+                .delete()
+                .addHeader("Authorization", token)
+                .build();
+        Response response = client.newCall(request).execute();
+        Assert.assertEquals(response.code(), 400);
+
+        ErrorDTO errorDTO = gson.fromJson(response.body().string(), ErrorDTO.class);
+        Assert.assertEquals(errorDTO.getError(), "Bad Request");
+        System.out.println(errorDTO.getMessage());
+        Assert.assertEquals(errorDTO.getMessage(), "Contact with id: 123 not found in your contacts!");
+    }
 }
 
-//5c925099-ef97-4222-8b24-3d4fc893fec9
-//sashov3260@gmail.ru
-//----------------------------------------------------------------
-//b8a9c2c3-2007-4329-80d5-1bae36864a83
-//sashov623@gmail.ru
-////----------------------------------------------------------------
