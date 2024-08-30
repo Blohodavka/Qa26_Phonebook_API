@@ -39,7 +39,6 @@ public class RegistrationTestsOkhttp {
     @Test
 
     public void registrationTestWrongEmail() throws IOException {
-        int i = (int) ((System.currentTimeMillis()/1000)%3600);
         AuthRequestDTO authDTO = AuthRequestDTO.builder()
                 .username("margagmail.com")
                 .password("Mmar123456$")
